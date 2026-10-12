@@ -1,571 +1,117 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#164c37">
-  <meta http-equiv="refresh" content="0; url=board.html">
-  <title>우리 반 칠판</title>
-  <script>window.location.replace("board.html");</script>
-  <style>
-    :root {
-      color-scheme: light;
-      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
-      background: #f3f1e8;
-      color: #20291f;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      min-width: 320px;
-      min-height: 100vh;
-      min-height: 100dvh;
-      margin: 0;
-    }
-
-    button,
-    select,
-    input {
-      font: inherit;
-    }
-
-    .app {
-      display: flex;
-      min-height: 100vh;
-      min-height: 100dvh;
-      flex-direction: column;
-      gap: 18px;
-      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
-        max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
-    }
-
-    .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      flex-wrap: wrap;
-    }
-
-    .format-toolbar {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      flex-wrap: wrap;
-      padding: 6px;
-      border: 1px solid #d3d0c3;
-      border-radius: 12px;
-      background: #fffefa;
-    }
-
-    .format-toolbar button,
-    .format-toolbar select {
-      min-width: 44px;
-      min-height: 44px;
-      padding: 0 10px;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      color: #26352b;
-      font-size: 1rem;
-    }
-
-    .format-toolbar button[aria-pressed="true"] {
-      background: #e6ecdf;
-    }
-
-    .format-toolbar button:hover,
-    .format-toolbar select:hover {
-      background: #f0f1e9;
-    }
-
-    .format-toolbar .separator {
-      width: 1px;
-      height: 28px;
-      margin: 0 3px;
-      background: #deddd4;
-    }
-
-    .visually-hidden {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      clip-path: inset(50%);
-    }
-
-    .heading {
-      margin: 0;
-      font-size: 1.35rem;
-      letter-spacing: -0.04em;
-    }
-
-    .controls {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .control {
-      display: flex;
-      min-height: 44px;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.95rem;
-    }
-
-    select,
-    input[type="number"],
-    button {
-      min-height: 44px;
-      border: 1px solid #c9c7ba;
-      border-radius: 10px;
-      background: #fffefa;
-      color: inherit;
-    }
-
-    select,
-    input[type="number"] {
-      padding: 0 10px;
-    }
-
-    select {
-      max-width: 150px;
-    }
-
-    input[type="number"] {
-      width: 78px;
-    }
-
-    input[type="range"] {
-      width: 112px;
-      accent-color: #216447;
-      touch-action: pan-x;
-    }
-
-    button {
-      padding: 0 16px;
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-
-    button:focus-visible,
-    select:focus-visible,
-    input:focus-visible,
-    textarea:focus-visible {
-      outline: 3px solid #e0a83e;
-      outline-offset: 2px;
-    }
-
-    .clear-button {
-      border-color: #8d3d32;
-      background: #fff8f5;
-      color: #8d3d32;
-      font-weight: 650;
-    }
-
-    .board-frame {
-      display: flex;
-      flex: 1;
-      min-height: 380px;
-      padding: clamp(10px, 2vw, 18px);
-      border: 8px solid #815331;
-      border-radius: 16px;
-      background: linear-gradient(145deg, #9a6940, #684126);
-      box-shadow: 0 8px 20px rgb(54 38 22 / 18%);
-    }
-
-    .board {
-      display: flex;
-      flex: 1;
-      min-height: 0;
-      border: 1px solid rgb(255 255 255 / 10%);
-      border-radius: 4px;
-      background:
-        radial-gradient(ellipse at 20% 15%, rgb(255 255 255 / 4%), transparent 45%),
-        linear-gradient(135deg, #17533d, #10442f);
-      box-shadow: inset 0 2px 16px rgb(0 0 0 / 18%);
-    }
-
-    .writing-area {
-      width: 100%;
-      min-height: 360px;
-      overflow-wrap: anywhere;
-      overflow-y: auto;
-      padding: clamp(20px, 4vw, 48px);
-      border: 0;
-      outline: 0;
-      background: transparent;
-      color: #fffef3;
-      font-family: var(--chalk-font, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif);
-      font-size: var(--chalk-size, 32px);
-      line-height: 1.65;
-      caret-color: #ffe58a;
-      text-shadow: 0 1px 1px rgb(0 0 0 / 20%);
-      -webkit-user-select: text;
-      user-select: text;
-      -webkit-touch-callout: default;
-    }
-
-    .writing-area:empty::before {
-      color: rgb(255 254 243 / 58%);
-      content: attr(data-placeholder);
-      pointer-events: none;
-    }
-
-    .writing-area ul,
-    .writing-area ol {
-      padding-inline-start: 1.5em;
-    }
-
-    .writing-area a {
-      color: #ffe58a;
-    }
-
-    .board-frame.is-fullscreen {
-      position: fixed;
-      z-index: 5;
-      inset: 0;
-      min-height: 100vh;
-      min-height: 100dvh;
-      border-radius: 0;
-    }
-
-    .save-status {
-      min-height: 1.4em;
-      margin: -8px 2px 0;
-      color: #62665b;
-      font-size: 0.9rem;
-    }
-
-    @media (max-width: 700px) {
-      .app {
-        gap: 12px;
-        padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
-          max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
-      }
-
-      .toolbar {
-        align-items: flex-start;
-      }
-
-      .controls {
-        width: 100%;
-        gap: 8px 12px;
-      }
-
-      .board-frame {
-        min-height: 50vh;
-        min-height: 50dvh;
-      }
-
-      .writing-area {
-        min-height: 45vh;
-        min-height: 45dvh;
-      }
-    }
-
-    @media (max-width: 420px) {
-      .control-size {
-        flex-wrap: wrap;
-      }
-
-      input[type="range"] {
-        width: 92px;
-      }
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>칠판 웹에디터</title>
+<style>
+:root{--board:#174d36;--board2:#205b40;--chalk:#f7f7ed;--muted:#d6e3d8;--wood:#795333;--paper:#f5f4ef}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:#17251f;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif}
+.page{max-width:1440px;margin:0 auto;padding:28px 24px 36px}
+.editor-shell{padding:9px;border-radius:9px;background:linear-gradient(135deg,#986b42,#5d3c22 30%,#a5794b 55%,#674326);box-shadow:0 12px 28px #17251f2b,inset 0 1px 2px #ffffff80}
+.editor-inner{overflow:hidden;border:2px solid #3b2c1d;border-radius:5px;background:var(--board);box-shadow:inset 0 0 0 3px #ffffff12}
+.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:10px 12px;background:#113e2b;border-bottom:1px solid #ffffff30;color:var(--chalk)}
+.toolbar button,.toolbar select,.toolbar input{font:inherit;color:inherit}
+.toolbar button{min-width:36px;height:36px;border:1px solid transparent;border-radius:5px;background:transparent;cursor:pointer;font-size:17px}
+.toolbar button:hover,.toolbar button:focus-visible{background:#ffffff18;border-color:#ffffff40;outline:none}
+.toolbar button.active{background:#ffffff25}
+.toolbar select{height:36px;max-width:155px;background:#174d36;border:1px solid #ffffff40;border-radius:5px;padding:0 8px}
+.toolbar input[type=color]{width:36px;height:36px;padding:3px;border:1px solid #ffffff40;border-radius:5px;background:transparent;cursor:pointer}
+.toolbar .font-size-control{display:flex;align-items:center;gap:6px;font-size:14px}
+.toolbar input[type=range]{width:100px;accent-color:#dce8d9;touch-action:pan-x}
+.toolbar input[type=number]{width:62px;height:36px;padding:0 5px;border:1px solid #ffffff40;border-radius:5px;background:#174d36}
+.sep{height:26px;width:1px;background:#ffffff45;margin:0 5px}
+#editor{min-height:480px;padding:clamp(22px,4vw,54px);outline:none;color:var(--chalk);font-size:var(--editor-font-size,20px);line-height:1.85;overflow-wrap:anywhere;background-color:var(--board);background-image:radial-gradient(ellipse at 18% 18%,#ffffff08,transparent 35%),radial-gradient(ellipse at 80% 70%,#00000010,transparent 40%),url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E")}
+#editor *{font-size:inherit!important}
+#editor:empty:before{content:attr(data-placeholder);color:#d6e3d899}
+#editor h1,#editor h2,#editor h3{color:#fff;font-family:"Comic Sans MS","Malgun Gothic",cursive}
+#editor h1{font-size:1.8em!important}
+#editor h2{font-size:1.5em!important}
+#editor h3{font-size:1.25em!important}
+#editor a{color:#fff3a6}
+#editor blockquote{border-left:4px solid #d7dfb4;margin-left:0;padding-left:18px;color:#dbe7d8}
+#editor table{border-collapse:collapse;width:100%}#editor td,#editor th{border:1px solid #ffffff99;padding:7px}
+#editor img{max-width:100%;height:auto}
+#editor ul,#editor ol{padding-left:1.5em}
+.footer{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#65716a;font-size:13px;padding:13px 4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.action{border:1px solid #c8cec8;background:white;color:#20382b;padding:9px 13px;border-radius:8px;font-weight:650;cursor:pointer}
+.action.primary{background:#205b40;color:white;border-color:#205b40}
+.status{min-height:18px;color:#43654f;font-size:13px}
+@media(max-width:600px){.page{padding:18px 12px}.toolbar{gap:2px;padding:8px}.toolbar button{min-width:32px}.sep{margin:0 2px}#editor{min-height:55vh;padding:20px}}
+@media(pointer:coarse){.toolbar button,.toolbar select,.toolbar input[type=number]{min-height:44px}.toolbar button{min-width:44px}.toolbar select{height:44px}}
+.editor-shell.is-fullscreen{position:fixed;z-index:9999;inset:0;width:100vw;height:100vh;height:100dvh;max-width:none;margin:0;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));border-radius:0;display:flex}
+.editor-shell.is-fullscreen .editor-inner{display:flex;flex:1;flex-direction:column;min-height:0}
+.editor-shell.is-fullscreen #editor{flex:1;min-height:0;overflow:auto}
+</style>
 </head>
 <body>
-  <main class="app">
-    <header class="toolbar">
-      <h1 class="heading">우리 반 칠판</h1>
-      <div class="controls" aria-label="칠판 설정">
-        <label class="control" for="font-family">
-          글꼴
-          <select id="font-family">
-            <option value="system">고딕</option>
-            <option value="serif">명조</option>
-            <option value="mono">고정폭</option>
-          </select>
-        </label>
-        <label class="control control-size" for="font-size">
-          글자 크기
-          <input id="font-range" type="range" min="18" max="72" step="1" value="32" aria-label="글자 크기 조절">
-          <input id="font-size" type="number" min="12" max="120" step="1" value="32" inputmode="numeric" aria-label="글자 크기 숫자 입력">
+<main class="page">
+  <section class="editor-shell is-fullscreen" aria-label="칠판 웹에디터">
+    <div class="editor-inner">
+      <div class="toolbar" role="toolbar" aria-label="편집 도구">
+        <button type="button" data-cmd="undo" title="실행 취소" aria-label="실행 취소">↶</button>
+        <button type="button" data-cmd="redo" title="다시 실행" aria-label="다시 실행">↷</button>
+        <button type="button" id="clear" title="내용 지우기" aria-label="내용 지우기">🧽</button><span class="sep"></span>
+        <select id="block" aria-label="문단 스타일">
+          <option value="p">일반 텍스트</option><option value="h1">제목 1</option><option value="h2">제목 2</option><option value="h3">제목 3</option><option value="blockquote">인용문</option><option value="pre">코드</option>
+        </select><span class="sep"></span>
+        <button type="button" data-cmd="bold" title="굵게"><b>B</b></button>
+        <button type="button" data-cmd="italic" title="기울임"><i>I</i></button>
+        <button type="button" data-cmd="underline" title="밑줄"><u>U</u></button>
+        <button type="button" data-cmd="strikeThrough" title="취소선"><s>S</s></button><span class="sep"></span>
+        <button type="button" data-cmd="justifyLeft" title="왼쪽 정렬">☰</button>
+        <button type="button" data-cmd="justifyCenter" title="가운데 정렬">≡</button>
+        <button type="button" data-cmd="justifyRight" title="오른쪽 정렬">☷</button><span class="sep"></span>
+        <button type="button" data-cmd="insertUnorderedList" title="글머리 기호">•≡</button>
+        <button type="button" data-cmd="insertOrderedList" title="번호 목록">1≡</button>
+        <button type="button" data-cmd="outdent" title="내어쓰기">⇤</button>
+        <button type="button" data-cmd="indent" title="들여쓰기">⇥</button><span class="sep"></span>
+        <button type="button" id="link" title="링크 삽입">🔗</button>
+        <button type="button" id="image" title="이미지 삽입">▧</button>
+        <button type="button" id="table" title="표 삽입">▦</button>
+        <label title="글자 색상"><input id="color" type="color" value="#ffffff" aria-label="글자 색상"></label>
+        <button type="button" id="chalk" title="분필 색상으로 초기화">✦</button>
+        <span class="sep"></span>
+        <label class="font-size-control" for="font-size">크기
+          <input id="font-range" type="range" min="12" max="72" step="1" value="20" aria-label="글자 크기 조절">
+          <input id="font-size" type="number" min="12" max="120" step="1" value="20" inputmode="numeric" aria-label="글자 크기 숫자 입력">
           <span aria-hidden="true">px</span>
         </label>
-        <button id="clear-board" class="clear-button" type="button">칠판 지우기</button>
+        <button type="button" id="fullscreen" title="전체화면 닫기" aria-label="전체화면 닫기" aria-pressed="true">⛶</button>
       </div>
-    </header>
-
-    <nav class="format-toolbar" aria-label="글 서식">
-      <button type="button" data-command="bold" aria-label="굵게" aria-pressed="false"><strong>B</strong></button>
-      <button type="button" data-command="italic" aria-label="기울임" aria-pressed="false"><em>I</em></button>
-      <button type="button" data-command="underline" aria-label="밑줄" aria-pressed="false"><u>U</u></button>
-      <button type="button" data-command="strikeThrough" aria-label="취소선" aria-pressed="false"><s>S</s></button>
-      <span class="separator" aria-hidden="true"></span>
-      <label class="visually-hidden" for="text-color">글자 색</label>
-      <select id="text-color" aria-label="글자 색">
-        <option value="#fffef3">흰색</option>
-        <option value="#ffe58a">노랑</option>
-        <option value="#ffb7c5">분홍</option>
-        <option value="#9ed5ff">하늘</option>
-      </select>
-      <span class="separator" aria-hidden="true"></span>
-      <button type="button" data-command="justifyLeft" aria-label="왼쪽 정렬" aria-pressed="false">≡←</button>
-      <button type="button" data-command="justifyCenter" aria-label="가운데 정렬" aria-pressed="false">≡</button>
-      <button type="button" data-command="justifyRight" aria-label="오른쪽 정렬" aria-pressed="false">→≡</button>
-      <span class="separator" aria-hidden="true"></span>
-      <button type="button" data-command="insertUnorderedList" aria-label="글머리 기호 목록">• 목록</button>
-      <button type="button" data-command="insertOrderedList" aria-label="번호 목록">1. 목록</button>
-      <button id="insert-link" type="button" aria-label="링크 삽입">링크</button>
-      <span class="separator" aria-hidden="true"></span>
-      <button id="undo" type="button" aria-label="실행 취소">↶</button>
-      <button id="redo" type="button" aria-label="다시 실행">↷</button>
-      <button id="toggle-fullscreen" type="button" aria-label="칠판 크게 보기" aria-pressed="false">⛶</button>
-    </nav>
-
-    <section class="board-frame" aria-label="칠판">
-      <div class="board">
-        <div id="writing-area" class="writing-area" role="textbox" aria-label="칠판 내용"
-          aria-multiline="true" contenteditable="true" data-placeholder="여기에 자유롭게 적어 보세요."></div>
-      </div>
-    </section>
-
-    <p id="save-status" class="save-status" role="status" aria-live="polite">이 기기의 브라우저에 자동 저장됩니다.</p>
-  </main>
-
-  <script>
-    (() => {
-      const storageKey = "school-play-chalkboard";
-      const writingArea = document.querySelector("#writing-area");
-      const fontFamily = document.querySelector("#font-family");
-      const fontSize = document.querySelector("#font-size");
-      const fontRange = document.querySelector("#font-range");
-      const clearButton = document.querySelector("#clear-board");
-      const saveStatus = document.querySelector("#save-status");
-      const boardFrame = document.querySelector(".board-frame");
-      const formatToolbar = document.querySelector(".format-toolbar");
-      let savedSelection = null;
-      const fontStacks = {
-        system: '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif',
-        serif: '"AppleMyungjo", "Noto Serif KR", serif',
-        mono: 'ui-monospace, "SFMono-Regular", Menlo, monospace'
-      };
-
-      function applySettings() {
-        document.documentElement.style.setProperty("--chalk-font", fontStacks[fontFamily.value]);
-        document.documentElement.style.setProperty("--chalk-size", `${fontSize.value}px`);
-        fontRange.value = String(Math.min(72, Math.max(18, Number(fontSize.value) || 32)));
-      }
-
-      function saveBoard() {
-        try {
-          localStorage.setItem(storageKey, JSON.stringify({
-            html: writingArea.innerHTML,
-            font: fontFamily.value,
-            size: fontSize.value
-          }));
-          saveStatus.textContent = "저장됨 · 이 기기의 브라우저에 보관 중";
-        } catch (error) {
-          saveStatus.textContent = "자동 저장에 실패했습니다. 브라우저 저장 공간 설정을 확인해 주세요.";
-          console.error("칠판 내용을 저장하지 못했습니다.", error);
-        }
-      }
-
-      function safeLink(url) {
-        try {
-          const parsed = new URL(url, window.location.href);
-          return ["http:", "https:", "mailto:"].includes(parsed.protocol) ? parsed.href : "";
-        } catch {
-          return "";
-        }
-      }
-
-      function sanitizeHtml(html) {
-        const allowedTags = new Set([
-          "A", "B", "BR", "DIV", "EM", "FONT", "I", "LI", "OL", "P", "S",
-          "SPAN", "STRIKE", "STRONG", "U", "UL"
-        ]);
-        const parsed = new DOMParser().parseFromString(html, "text/html");
-
-        function cleanNode(node) {
-          if (node.nodeType === Node.TEXT_NODE) {
-            return document.createTextNode(node.textContent || "");
-          }
-          if (node.nodeType !== Node.ELEMENT_NODE) {
-            return document.createDocumentFragment();
-          }
-
-          const element = node;
-          const tag = element.tagName;
-          const children = Array.from(element.childNodes, cleanNode);
-          if (!allowedTags.has(tag)) {
-            const fragment = document.createDocumentFragment();
-            children.forEach(child => fragment.append(child));
-            return fragment;
-          }
-
-          const clean = document.createElement(tag.toLowerCase());
-          children.forEach(child => clean.append(child));
-          if (tag === "A") {
-            const href = safeLink(element.getAttribute("href") || "");
-            if (href) {
-              clean.setAttribute("href", href);
-              clean.setAttribute("target", "_blank");
-              clean.setAttribute("rel", "noopener noreferrer");
-            }
-          } else if (tag === "FONT") {
-            const color = element.getAttribute("color") || "";
-            if (/^#[0-9a-f]{3,8}$/i.test(color) || /^[a-z]{3,20}$/i.test(color)) {
-              clean.setAttribute("color", color);
-            }
-          }
-          return clean;
-        }
-
-        const fragment = document.createDocumentFragment();
-        Array.from(parsed.body.childNodes, cleanNode).forEach(node => fragment.append(node));
-        return fragment;
-      }
-
-      function rememberSelection() {
-        const selection = window.getSelection();
-        if (selection && selection.rangeCount && writingArea.contains(selection.anchorNode)) {
-          savedSelection = selection.getRangeAt(0).cloneRange();
-        }
-      }
-
-      function restoreSelection() {
-        if (!savedSelection || !writingArea.contains(savedSelection.commonAncestorContainer)) {
-          writingArea.focus();
-          return;
-        }
-        const selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(savedSelection);
-        writingArea.focus();
-      }
-
-      function runCommand(command, value = null) {
-        restoreSelection();
-        document.execCommand(command, false, value);
-        rememberSelection();
-        saveBoard();
-        updateToolbarState();
-      }
-
-      function updateToolbarState() {
-        for (const button of formatToolbar.querySelectorAll("[data-command]")) {
-          const command = button.dataset.command;
-          if (["bold", "italic", "underline", "strikeThrough"].includes(command)) {
-            button.setAttribute("aria-pressed", String(document.queryCommandState(command)));
-          }
-        }
-      }
-
-      function loadBoard() {
-        try {
-          const saved = localStorage.getItem(storageKey);
-          if (saved) {
-            const board = JSON.parse(saved);
-            if (typeof board.html === "string") {
-              writingArea.replaceChildren(sanitizeHtml(board.html));
-            } else if (typeof board.text === "string") {
-              writingArea.textContent = board.text;
-            }
-            if (Object.hasOwn(fontStacks, board.font)) {
-              fontFamily.value = board.font;
-            }
-            const size = Number(board.size);
-            if (Number.isFinite(size) && size >= 12 && size <= 120) {
-              fontSize.value = String(size);
-            }
-            saveStatus.textContent = "저장된 칠판 내용을 불러왔습니다.";
-          }
-          applySettings();
-        } catch (error) {
-          saveStatus.textContent = "저장된 내용을 불러오지 못했습니다. 브라우저 저장 공간 설정을 확인해 주세요.";
-          console.error("칠판 내용을 불러오지 못했습니다.", error);
-        }
-      }
-
-      writingArea.addEventListener("input", saveBoard);
-      writingArea.addEventListener("keyup", updateToolbarState);
-      writingArea.addEventListener("mouseup", updateToolbarState);
-      writingArea.addEventListener("touchend", updateToolbarState);
-      document.addEventListener("selectionchange", rememberSelection);
-      writingArea.addEventListener("paste", event => {
-        event.preventDefault();
-        const text = event.clipboardData.getData("text/plain");
-        runCommand("insertText", text);
-      });
-      formatToolbar.addEventListener("click", event => {
-        const button = event.target.closest("[data-command]");
-        if (button) {
-          runCommand(button.dataset.command);
-        }
-      });
-      document.querySelector("#text-color").addEventListener("change", event => {
-        runCommand("foreColor", event.currentTarget.value);
-      });
-      document.querySelector("#insert-link").addEventListener("click", () => {
-        const url = window.prompt("연결할 웹 주소를 입력해 주세요.");
-        if (url) {
-          const href = safeLink(url);
-          if (!href) {
-            window.alert("http, https 또는 mailto 주소만 사용할 수 있어요.");
-            return;
-          }
-          runCommand("createLink", href);
-        }
-      });
-      document.querySelector("#undo").addEventListener("click", () => runCommand("undo"));
-      document.querySelector("#redo").addEventListener("click", () => runCommand("redo"));
-      document.querySelector("#toggle-fullscreen").addEventListener("click", event => {
-        const isFullscreen = boardFrame.classList.toggle("is-fullscreen");
-        event.currentTarget.setAttribute("aria-pressed", String(isFullscreen));
-        event.currentTarget.setAttribute("aria-label", isFullscreen ? "칠판 크게 보기 닫기" : "칠판 크게 보기");
-      });
-      formatToolbar.addEventListener("mousedown", event => {
-        if (event.target.closest("button")) {
-          event.preventDefault();
-        }
-      });
-      fontFamily.addEventListener("change", () => {
-        applySettings();
-        saveBoard();
-      });
-      fontSize.addEventListener("input", () => {
-        const size = Number(fontSize.value);
-        if (Number.isFinite(size) && size >= 12 && size <= 120) {
-          applySettings();
-          saveBoard();
-        }
-      });
-      fontRange.addEventListener("input", () => {
-        fontSize.value = fontRange.value;
-        applySettings();
-        saveBoard();
-      });
-      clearButton.addEventListener("click", () => {
-        if (writingArea.textContent && !window.confirm("칠판의 내용을 모두 지울까요?")) {
-          return;
-        }
-        writingArea.replaceChildren();
-        saveBoard();
-        writingArea.focus();
-      });
-
-      loadBoard();
-    })();
-  </script>
+      <div id="editor" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="false" data-placeholder="칠판에 내용을 입력하세요..."><h1>오늘의 수업</h1><p>웹에디터를 칠판처럼 꾸며 보세요!</p><ol><li>초록색 배경과 흰색 분필 글씨</li><li>굵게, 기울임, 밑줄, 정렬 및 목록</li><li>링크, 이미지, 표 삽입</li></ol><p><br></p><p>지금 바로 써보세요! ☺</p></div>
+    </div>
+  </section>
+  <div class="footer"><span id="wordcount">글자 0자 · 단어 0개</span><span>내용과 글자 크기는 이 브라우저에 자동 저장됩니다.</span></div>
+  <p class="status" id="status" aria-live="polite"></p>
+</main>
+<script>
+const editor=document.getElementById('editor'), status=document.getElementById('status');
+const storageKey='school-play-board-editor';
+const fontSize=document.getElementById('font-size'), fontRange=document.getElementById('font-range');
+const editorShell=document.querySelector('.editor-shell'), fullscreenButton=document.getElementById('fullscreen');
+function focusEditor(){editor.focus()}
+function saveBoard(){try{localStorage.setItem(storageKey,JSON.stringify({html:editor.innerHTML,fontSize:fontSize.value}));status.textContent='자동 저장됨'}catch(error){status.textContent='자동 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.';console.error('칠판 내용을 저장하지 못했습니다.',error)}}
+function setFontSize(value,save=true){const size=Number(value);if(!Number.isFinite(size)||size<12||size>120)return;fontSize.value=String(size);fontRange.value=String(Math.min(72,size));editor.style.setProperty('--editor-font-size',`${size}px`);if(save)saveBoard()}
+function loadBoard(){try{const saved=localStorage.getItem(storageKey);if(saved){const board=JSON.parse(saved);if(typeof board.html==='string')editor.innerHTML=board.html;if(board.fontSize!==undefined)setFontSize(board.fontSize,false);status.textContent='저장된 내용을 불러왔습니다.'}}catch(error){status.textContent='저장된 내용을 불러오지 못했습니다. 브라우저 저장 공간을 확인해 주세요.';console.error('칠판 내용을 불러오지 못했습니다.',error)}}
+function updateCount(){const t=editor.innerText||'';document.getElementById('wordcount').textContent=`글자 ${t.replace(/\s/g,'').length}자 · 단어 ${(t.trim().match(/\S+/g)||[]).length}개`}
+document.querySelectorAll('[data-cmd]').forEach(btn=>btn.addEventListener('click',()=>{focusEditor();document.execCommand(btn.dataset.cmd,false,null);updateCount();saveBoard()}));
+document.getElementById('block').addEventListener('change',e=>{focusEditor();document.execCommand('formatBlock',false,e.target.value);saveBoard()});
+document.getElementById('color').addEventListener('input',e=>{focusEditor();document.execCommand('foreColor',false,e.target.value);saveBoard()});
+document.getElementById('chalk').addEventListener('click',()=>{focusEditor();document.execCommand('foreColor',false,'#ffffff');saveBoard()});
+document.getElementById('link').addEventListener('click',()=>{const url=prompt('연결할 URL을 입력하세요');if(url){focusEditor();document.execCommand('createLink',false,url);saveBoard()}});
+document.getElementById('image').addEventListener('click',()=>{const url=prompt('이미지 URL을 입력하세요');if(url){focusEditor();document.execCommand('insertImage',false,url);saveBoard()}});
+document.getElementById('table').addEventListener('click',()=>{focusEditor();const rows=Math.max(1,Math.min(10,parseInt(prompt('행 수를 입력하세요','2'),10)||2));const cols=Math.max(1,Math.min(8,parseInt(prompt('열 수를 입력하세요','2'),10)||2));let t='<table><tbody>';for(let r=0;r<rows;r++){t+='<tr>';for(let c=0;c<cols;c++)t+=r===0?'<th>제목</th>':'<td>내용</td>';t+='</tr>'}t+='</tbody></table><p><br></p>';document.execCommand('insertHTML',false,t);saveBoard()});
+editor.addEventListener('input',()=>{updateCount();saveBoard()});updateCount();
+fontSize.addEventListener('input',()=>setFontSize(fontSize.value));
+fontRange.addEventListener('input',()=>setFontSize(fontRange.value));
+document.getElementById('clear').addEventListener('click',()=>{if(confirm('작성한 내용을 모두 지울까요?')){editor.innerHTML='';updateCount();saveBoard();status.textContent='내용을 지웠습니다.';focusEditor()}});
+function toggleFullscreen(force){const enabled=typeof force==='boolean'?force:!editorShell.classList.contains('is-fullscreen');editorShell.classList.toggle('is-fullscreen',enabled);fullscreenButton.setAttribute('aria-pressed',String(enabled));fullscreenButton.setAttribute('aria-label',enabled?'전체화면 닫기':'전체화면');fullscreenButton.title=enabled?'전체화면 닫기':'전체화면';if(enabled)focusEditor()}
+fullscreenButton.addEventListener('click',()=>toggleFullscreen());
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&editorShell.classList.contains('is-fullscreen'))toggleFullscreen(false)});
+loadBoard();
+</script>
 </body>
 </html>

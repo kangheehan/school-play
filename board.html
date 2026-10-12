@@ -1,117 +1,13 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>칠판 웹에디터</title>
-<style>
-:root{--board:#174d36;--board2:#205b40;--chalk:#f7f7ed;--muted:#d6e3d8;--wood:#795333;--paper:#f5f4ef}
-*{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:#17251f;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif}
-.page{max-width:1440px;margin:0 auto;padding:28px 24px 36px}
-.editor-shell{padding:9px;border-radius:9px;background:linear-gradient(135deg,#986b42,#5d3c22 30%,#a5794b 55%,#674326);box-shadow:0 12px 28px #17251f2b,inset 0 1px 2px #ffffff80}
-.editor-inner{overflow:hidden;border:2px solid #3b2c1d;border-radius:5px;background:var(--board);box-shadow:inset 0 0 0 3px #ffffff12}
-.toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:4px;padding:10px 12px;background:#113e2b;border-bottom:1px solid #ffffff30;color:var(--chalk)}
-.toolbar button,.toolbar select,.toolbar input{font:inherit;color:inherit}
-.toolbar button{min-width:36px;height:36px;border:1px solid transparent;border-radius:5px;background:transparent;cursor:pointer;font-size:17px}
-.toolbar button:hover,.toolbar button:focus-visible{background:#ffffff18;border-color:#ffffff40;outline:none}
-.toolbar button.active{background:#ffffff25}
-.toolbar select{height:36px;max-width:155px;background:#174d36;border:1px solid #ffffff40;border-radius:5px;padding:0 8px}
-.toolbar input[type=color]{width:36px;height:36px;padding:3px;border:1px solid #ffffff40;border-radius:5px;background:transparent;cursor:pointer}
-.toolbar .font-size-control{display:flex;align-items:center;gap:6px;font-size:14px}
-.toolbar input[type=range]{width:100px;accent-color:#dce8d9;touch-action:pan-x}
-.toolbar input[type=number]{width:62px;height:36px;padding:0 5px;border:1px solid #ffffff40;border-radius:5px;background:#174d36}
-.sep{height:26px;width:1px;background:#ffffff45;margin:0 5px}
-#editor{min-height:480px;padding:clamp(22px,4vw,54px);outline:none;color:var(--chalk);font-size:var(--editor-font-size,20px);line-height:1.85;overflow-wrap:anywhere;background-color:var(--board);background-image:radial-gradient(ellipse at 18% 18%,#ffffff08,transparent 35%),radial-gradient(ellipse at 80% 70%,#00000010,transparent 40%),url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.12'/%3E%3C/svg%3E")}
-#editor *{font-size:inherit!important}
-#editor:empty:before{content:attr(data-placeholder);color:#d6e3d899}
-#editor h1,#editor h2,#editor h3{color:#fff;font-family:"Comic Sans MS","Malgun Gothic",cursive}
-#editor h1{font-size:1.8em!important}
-#editor h2{font-size:1.5em!important}
-#editor h3{font-size:1.25em!important}
-#editor a{color:#fff3a6}
-#editor blockquote{border-left:4px solid #d7dfb4;margin-left:0;padding-left:18px;color:#dbe7d8}
-#editor table{border-collapse:collapse;width:100%}#editor td,#editor th{border:1px solid #ffffff99;padding:7px}
-#editor img{max-width:100%;height:auto}
-#editor ul,#editor ol{padding-left:1.5em}
-.footer{display:flex;justify-content:space-between;gap:12px;align-items:center;color:#65716a;font-size:13px;padding:13px 4px}
-.actions{display:flex;gap:8px;flex-wrap:wrap}
-.action{border:1px solid #c8cec8;background:white;color:#20382b;padding:9px 13px;border-radius:8px;font-weight:650;cursor:pointer}
-.action.primary{background:#205b40;color:white;border-color:#205b40}
-.status{min-height:18px;color:#43654f;font-size:13px}
-@media(max-width:600px){.page{padding:18px 12px}.toolbar{gap:2px;padding:8px}.toolbar button{min-width:32px}.sep{margin:0 2px}#editor{min-height:55vh;padding:20px}}
-@media(pointer:coarse){.toolbar button,.toolbar select,.toolbar input[type=number]{min-height:44px}.toolbar button{min-width:44px}.toolbar select{height:44px}}
-.editor-shell.is-fullscreen{position:fixed;z-index:9999;inset:0;width:100vw;height:100vh;height:100dvh;max-width:none;margin:0;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));border-radius:0;display:flex}
-.editor-shell.is-fullscreen .editor-inner{display:flex;flex:1;flex-direction:column;min-height:0}
-.editor-shell.is-fullscreen #editor{flex:1;min-height:0;overflow:auto}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="0; url=./">
+  <title>우리 반 칠판</title>
+  <script>window.location.replace("./");</script>
 </head>
 <body>
-<main class="page">
-  <section class="editor-shell" aria-label="칠판 웹에디터">
-    <div class="editor-inner">
-      <div class="toolbar" role="toolbar" aria-label="편집 도구">
-        <button type="button" data-cmd="undo" title="실행 취소" aria-label="실행 취소">↶</button>
-        <button type="button" data-cmd="redo" title="다시 실행" aria-label="다시 실행">↷</button>
-        <button type="button" id="clear" title="내용 지우기" aria-label="내용 지우기">🧽</button><span class="sep"></span>
-        <select id="block" aria-label="문단 스타일">
-          <option value="p">일반 텍스트</option><option value="h1">제목 1</option><option value="h2">제목 2</option><option value="h3">제목 3</option><option value="blockquote">인용문</option><option value="pre">코드</option>
-        </select><span class="sep"></span>
-        <button type="button" data-cmd="bold" title="굵게"><b>B</b></button>
-        <button type="button" data-cmd="italic" title="기울임"><i>I</i></button>
-        <button type="button" data-cmd="underline" title="밑줄"><u>U</u></button>
-        <button type="button" data-cmd="strikeThrough" title="취소선"><s>S</s></button><span class="sep"></span>
-        <button type="button" data-cmd="justifyLeft" title="왼쪽 정렬">☰</button>
-        <button type="button" data-cmd="justifyCenter" title="가운데 정렬">≡</button>
-        <button type="button" data-cmd="justifyRight" title="오른쪽 정렬">☷</button><span class="sep"></span>
-        <button type="button" data-cmd="insertUnorderedList" title="글머리 기호">•≡</button>
-        <button type="button" data-cmd="insertOrderedList" title="번호 목록">1≡</button>
-        <button type="button" data-cmd="outdent" title="내어쓰기">⇤</button>
-        <button type="button" data-cmd="indent" title="들여쓰기">⇥</button><span class="sep"></span>
-        <button type="button" id="link" title="링크 삽입">🔗</button>
-        <button type="button" id="image" title="이미지 삽입">▧</button>
-        <button type="button" id="table" title="표 삽입">▦</button>
-        <label title="글자 색상"><input id="color" type="color" value="#ffffff" aria-label="글자 색상"></label>
-        <button type="button" id="chalk" title="분필 색상으로 초기화">✦</button>
-        <span class="sep"></span>
-        <label class="font-size-control" for="font-size">크기
-          <input id="font-range" type="range" min="12" max="72" step="1" value="20" aria-label="글자 크기 조절">
-          <input id="font-size" type="number" min="12" max="120" step="1" value="20" inputmode="numeric" aria-label="글자 크기 숫자 입력">
-          <span aria-hidden="true">px</span>
-        </label>
-        <button type="button" id="fullscreen" title="전체화면" aria-label="전체화면" aria-pressed="false">⛶</button>
-      </div>
-      <div id="editor" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="false" data-placeholder="칠판에 내용을 입력하세요..."><h1>오늘의 수업</h1><p>웹에디터를 칠판처럼 꾸며 보세요!</p><ol><li>초록색 배경과 흰색 분필 글씨</li><li>굵게, 기울임, 밑줄, 정렬 및 목록</li><li>링크, 이미지, 표 삽입</li></ol><p><br></p><p>지금 바로 써보세요! ☺</p></div>
-    </div>
-  </section>
-  <div class="footer"><span id="wordcount">글자 0자 · 단어 0개</span><span>내용과 글자 크기는 이 브라우저에 자동 저장됩니다.</span></div>
-  <p class="status" id="status" aria-live="polite"></p>
-</main>
-<script>
-const editor=document.getElementById('editor'), status=document.getElementById('status');
-const storageKey='school-play-board-editor';
-const fontSize=document.getElementById('font-size'), fontRange=document.getElementById('font-range');
-const editorShell=document.querySelector('.editor-shell'), fullscreenButton=document.getElementById('fullscreen');
-function focusEditor(){editor.focus()}
-function saveBoard(){try{localStorage.setItem(storageKey,JSON.stringify({html:editor.innerHTML,fontSize:fontSize.value}));status.textContent='자동 저장됨'}catch(error){status.textContent='자동 저장에 실패했습니다. 브라우저 저장 공간을 확인해 주세요.';console.error('칠판 내용을 저장하지 못했습니다.',error)}}
-function setFontSize(value,save=true){const size=Number(value);if(!Number.isFinite(size)||size<12||size>120)return;fontSize.value=String(size);fontRange.value=String(Math.min(72,size));editor.style.setProperty('--editor-font-size',`${size}px`);if(save)saveBoard()}
-function loadBoard(){try{const saved=localStorage.getItem(storageKey);if(saved){const board=JSON.parse(saved);if(typeof board.html==='string')editor.innerHTML=board.html;if(board.fontSize!==undefined)setFontSize(board.fontSize,false);status.textContent='저장된 내용을 불러왔습니다.'}}catch(error){status.textContent='저장된 내용을 불러오지 못했습니다. 브라우저 저장 공간을 확인해 주세요.';console.error('칠판 내용을 불러오지 못했습니다.',error)}}
-function updateCount(){const t=editor.innerText||'';document.getElementById('wordcount').textContent=`글자 ${t.replace(/\s/g,'').length}자 · 단어 ${(t.trim().match(/\S+/g)||[]).length}개`}
-document.querySelectorAll('[data-cmd]').forEach(btn=>btn.addEventListener('click',()=>{focusEditor();document.execCommand(btn.dataset.cmd,false,null);updateCount();saveBoard()}));
-document.getElementById('block').addEventListener('change',e=>{focusEditor();document.execCommand('formatBlock',false,e.target.value);saveBoard()});
-document.getElementById('color').addEventListener('input',e=>{focusEditor();document.execCommand('foreColor',false,e.target.value);saveBoard()});
-document.getElementById('chalk').addEventListener('click',()=>{focusEditor();document.execCommand('foreColor',false,'#ffffff');saveBoard()});
-document.getElementById('link').addEventListener('click',()=>{const url=prompt('연결할 URL을 입력하세요');if(url){focusEditor();document.execCommand('createLink',false,url);saveBoard()}});
-document.getElementById('image').addEventListener('click',()=>{const url=prompt('이미지 URL을 입력하세요');if(url){focusEditor();document.execCommand('insertImage',false,url);saveBoard()}});
-document.getElementById('table').addEventListener('click',()=>{focusEditor();const rows=Math.max(1,Math.min(10,parseInt(prompt('행 수를 입력하세요','2'),10)||2));const cols=Math.max(1,Math.min(8,parseInt(prompt('열 수를 입력하세요','2'),10)||2));let t='<table><tbody>';for(let r=0;r<rows;r++){t+='<tr>';for(let c=0;c<cols;c++)t+=r===0?'<th>제목</th>':'<td>내용</td>';t+='</tr>'}t+='</tbody></table><p><br></p>';document.execCommand('insertHTML',false,t);saveBoard()});
-editor.addEventListener('input',()=>{updateCount();saveBoard()});updateCount();
-fontSize.addEventListener('input',()=>setFontSize(fontSize.value));
-fontRange.addEventListener('input',()=>setFontSize(fontRange.value));
-document.getElementById('clear').addEventListener('click',()=>{if(confirm('작성한 내용을 모두 지울까요?')){editor.innerHTML='';updateCount();saveBoard();status.textContent='내용을 지웠습니다.';focusEditor()}});
-function toggleFullscreen(force){const enabled=typeof force==='boolean'?force:!editorShell.classList.contains('is-fullscreen');editorShell.classList.toggle('is-fullscreen',enabled);fullscreenButton.setAttribute('aria-pressed',String(enabled));fullscreenButton.setAttribute('aria-label',enabled?'전체화면 닫기':'전체화면');fullscreenButton.title=enabled?'전체화면 닫기':'전체화면';if(enabled)focusEditor()}
-fullscreenButton.addEventListener('click',()=>toggleFullscreen());
-document.addEventListener('keydown',event=>{if(event.key==='Escape'&&editorShell.classList.contains('is-fullscreen'))toggleFullscreen(false)});
-loadBoard();
-</script>
+  <p><a href="./">칠판 에디터 열기</a></p>
 </body>
 </html>
