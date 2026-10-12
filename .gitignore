@@ -1,0 +1,15 @@
+# Local prompt notes and session context
+prompt.md
+
+# Operating system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local configuration and generated files
+.env
+.env.*
+!.env.example
+*.log
+node_modules/
+dist/

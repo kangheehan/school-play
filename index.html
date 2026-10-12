@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#164c37">
+  <title>우리 반 칠판</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+      background: #f3f1e8;
+      color: #20291f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      min-height: 100dvh;
+      margin: 0;
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+      min-height: 100dvh;
+      flex-direction: column;
+      gap: 18px;
+      padding: max(20px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right))
+        max(20px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .format-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex-wrap: wrap;
+      padding: 6px;
+      border: 1px solid #d3d0c3;
+      border-radius: 12px;
+      background: #fffefa;
+    }
+
+    .format-toolbar button,
+    .format-toolbar select {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 10px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      color: #26352b;
+      font-size: 1rem;
+    }
+
+    .format-toolbar button[aria-pressed="true"] {
+      background: #e6ecdf;
+    }
+
+    .format-toolbar button:hover,
+    .format-toolbar select:hover {
+      background: #f0f1e9;
+    }
+
+    .format-toolbar .separator {
+      width: 1px;
+      height: 28px;
+      margin: 0 3px;
+      background: #deddd4;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      clip-path: inset(50%);
+    }
+
+    .heading {
+      margin: 0;
+      font-size: 1.35rem;
+      letter-spacing: -0.04em;
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .control {
+      display: flex;
+      min-height: 44px;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    select,
+    input[type="number"],
+    button {
+      min-height: 44px;
+      border: 1px solid #c9c7ba;
+      border-radius: 10px;
+      background: #fffefa;
+      color: inherit;
+    }
+
+    select,
+    input[type="number"] {
+      padding: 0 10px;
+    }
+
+    select {
+      max-width: 150px;
+    }
+
+    input[type="number"] {
+      width: 78px;
+    }
+
+    input[type="range"] {
+      width: 112px;
+      accent-color: #216447;
+      touch-action: pan-x;
+    }
+
+    button {
+      padding: 0 16px;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    button:focus-visible,
+    select:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid #e0a83e;
+      outline-offset: 2px;
+    }
+
+    .clear-button {
+      border-color: #8d3d32;
+      background: #fff8f5;
+      color: #8d3d32;
+      font-weight: 650;
+    }
+
+    .board-frame {
+      display: flex;
+      flex: 1;
+      min-height: 380px;
+      padding: clamp(10px, 2vw, 18px);
+      border: 8px solid #815331;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #9a6940, #684126);
+      box-shadow: 0 8px 20px rgb(54 38 22 / 18%);
+    }
+
+    .board {
+      display: flex;
+      flex: 1;
+      min-height: 0;
+      border: 1px solid rgb(255 255 255 / 10%);
+      border-radius: 4px;
+      background:
+        radial-gradient(ellipse at 20% 15%, rgb(255 255 255 / 4%), transparent 45%),
+        linear-gradient(135deg, #17533d, #10442f);
+      box-shadow: inset 0 2px 16px rgb(0 0 0 / 18%);
+    }
+
+    .writing-area {
+      width: 100%;
+      min-height: 360px;
+      overflow-wrap: anywhere;
+      overflow-y: auto;
+      padding: clamp(20px, 4vw, 48px);
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: #fffef3;
+      font-family: var(--chalk-font, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif);
+      font-size: var(--chalk-size, 32px);
+      line-height: 1.65;
+      caret-color: #ffe58a;
+      text-shadow: 0 1px 1px rgb(0 0 0 / 20%);
+      -webkit-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: default;
+    }
+
+    .writing-area:empty::before {
+      color: rgb(255 254 243 / 58%);
+      content: attr(data-placeholder);
+      pointer-events: none;
+    }
+
+    .writing-area ul,
+    .writing-area ol {
+      padding-inline-start: 1.5em;
+    }
+
+    .writing-area a {
+      color: #ffe58a;
+    }
+
+    .board-frame.is-fullscreen {
+      position: fixed;
+      z-index: 5;
+      inset: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      border-radius: 0;
+    }
+
+    .save-status {
+      min-height: 1.4em;
+      margin: -8px 2px 0;
+      color: #62665b;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 700px) {
+      .app {
+        gap: 12px;
+        padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right))
+          max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+      }
+
+      .toolbar {
+        align-items: flex-start;
+      }
+
+      .controls {
+        width: 100%;
+        gap: 8px 12px;
+      }
+
+      .board-frame {
+        min-height: 50vh;
+        min-height: 50dvh;
+      }
+
+      .writing-area {
+        min-height: 45vh;
+        min-height: 45dvh;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .control-size {
+        flex-wrap: wrap;
+      }
+
+      input[type="range"] {
+        width: 92px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <header class="toolbar">
+      <h1 class="heading">우리 반 칠판</h1>
+      <div class="controls" aria-label="칠판 설정">
+        <label class="control" for="font-family">
+          글꼴
+          <select id="font-family">
+            <option value="system">고딕</option>
+            <option value="serif">명조</option>
+            <option value="mono">고정폭</option>
+          </select>
+        </label>
+        <label class="control control-size" for="font-size">
+          글자 크기
+          <input id="font-range" type="range" min="18" max="72" step="1" value="32" aria-label="글자 크기 조절">
+          <input id="font-size" type="number" min="12" max="120" step="1" value="32" inputmode="numeric" aria-label="글자 크기 숫자 입력">
+          <span aria-hidden="true">px</span>
+        </label>
+        <button id="clear-board" class="clear-button" type="button">칠판 지우기</button>
+      </div>
+    </header>
+
+    <nav class="format-toolbar" aria-label="글 서식">
+      <button type="button" data-command="bold" aria-label="굵게" aria-pressed="false"><strong>B</strong></button>
+      <button type="button" data-command="italic" aria-label="기울임" aria-pressed="false"><em>I</em></button>
+      <button type="button" data-command="underline" aria-label="밑줄" aria-pressed="false"><u>U</u></button>
+      <button type="button" data-command="strikeThrough" aria-label="취소선" aria-pressed="false"><s>S</s></button>
+      <span class="separator" aria-hidden="true"></span>
+      <label class="visually-hidden" for="text-color">글자 색</label>
+      <select id="text-color" aria-label="글자 색">
+        <option value="#fffef3">흰색</option>
+        <option value="#ffe58a">노랑</option>
+        <option value="#ffb7c5">분홍</option>
+        <option value="#9ed5ff">하늘</option>
+      </select>
+      <span class="separator" aria-hidden="true"></span>
+      <button type="button" data-command="justifyLeft" aria-label="왼쪽 정렬" aria-pressed="false">≡←</button>
+      <button type="button" data-command="justifyCenter" aria-label="가운데 정렬" aria-pressed="false">≡</button>
+      <button type="button" data-command="justifyRight" aria-label="오른쪽 정렬" aria-pressed="false">→≡</button>
+      <span class="separator" aria-hidden="true"></span>
+      <button type="button" data-command="insertUnorderedList" aria-label="글머리 기호 목록">• 목록</button>
+      <button type="button" data-command="insertOrderedList" aria-label="번호 목록">1. 목록</button>
+      <button id="insert-link" type="button" aria-label="링크 삽입">링크</button>
+      <span class="separator" aria-hidden="true"></span>
+      <button id="undo" type="button" aria-label="실행 취소">↶</button>
+      <button id="redo" type="button" aria-label="다시 실행">↷</button>
+      <button id="toggle-fullscreen" type="button" aria-label="칠판 크게 보기" aria-pressed="false">⛶</button>
+    </nav>
+
+    <section class="board-frame" aria-label="칠판">
+      <div class="board">
+        <div id="writing-area" class="writing-area" role="textbox" aria-label="칠판 내용"
+          aria-multiline="true" contenteditable="true" data-placeholder="여기에 자유롭게 적어 보세요."></div>
+      </div>
+    </section>
+
+    <p id="save-status" class="save-status" role="status" aria-live="polite">이 기기의 브라우저에 자동 저장됩니다.</p>
+  </main>
+
+  <script>
+    (() => {
+      const storageKey = "school-play-chalkboard";
+      const writingArea = document.querySelector("#writing-area");
+      const fontFamily = document.querySelector("#font-family");
+      const fontSize = document.querySelector("#font-size");
+      const fontRange = document.querySelector("#font-range");
+      const clearButton = document.querySelector("#clear-board");
+      const saveStatus = document.querySelector("#save-status");
+      const boardFrame = document.querySelector(".board-frame");
+      const formatToolbar = document.querySelector(".format-toolbar");
+      let savedSelection = null;
+      const fontStacks = {
+        system: '-apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif',
+        serif: '"AppleMyungjo", "Noto Serif KR", serif',
+        mono: 'ui-monospace, "SFMono-Regular", Menlo, monospace'
+      };
+
+      function applySettings() {
+        document.documentElement.style.setProperty("--chalk-font", fontStacks[fontFamily.value]);
+        document.documentElement.style.setProperty("--chalk-size", `${fontSize.value}px`);
+        fontRange.value = String(Math.min(72, Math.max(18, Number(fontSize.value) || 32)));
+      }
+
+      function saveBoard() {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify({
+            html: writingArea.innerHTML,
+            font: fontFamily.value,
+            size: fontSize.value
+          }));
+          saveStatus.textContent = "저장됨 · 이 기기의 브라우저에 보관 중";
+        } catch (error) {
+          saveStatus.textContent = "자동 저장에 실패했습니다. 브라우저 저장 공간 설정을 확인해 주세요.";
+          console.error("칠판 내용을 저장하지 못했습니다.", error);
+        }
+      }
+
+      function safeLink(url) {
+        try {
+          const parsed = new URL(url, window.location.href);
+          return ["http:", "https:", "mailto:"].includes(parsed.protocol) ? parsed.href : "";
+        } catch {
+          return "";
+        }
+      }
+
+      function sanitizeHtml(html) {
+        const allowedTags = new Set([
+          "A", "B", "BR", "DIV", "EM", "FONT", "I", "LI", "OL", "P", "S",
+          "SPAN", "STRIKE", "STRONG", "U", "UL"
+        ]);
+        const parsed = new DOMParser().parseFromString(html, "text/html");
+
+        function cleanNode(node) {
+          if (node.nodeType === Node.TEXT_NODE) {
+            return document.createTextNode(node.textContent || "");
+          }
+          if (node.nodeType !== Node.ELEMENT_NODE) {
+            return document.createDocumentFragment();
+          }
+
+          const element = node;
+          const tag = element.tagName;
+          const children = Array.from(element.childNodes, cleanNode);
+          if (!allowedTags.has(tag)) {
+            const fragment = document.createDocumentFragment();
+            children.forEach(child => fragment.append(child));
+            return fragment;
+          }
+
+          const clean = document.createElement(tag.toLowerCase());
+          children.forEach(child => clean.append(child));
+          if (tag === "A") {
+            const href = safeLink(element.getAttribute("href") || "");
+            if (href) {
+              clean.setAttribute("href", href);
+              clean.setAttribute("target", "_blank");
+              clean.setAttribute("rel", "noopener noreferrer");
+            }
+          } else if (tag === "FONT") {
+            const color = element.getAttribute("color") || "";
+            if (/^#[0-9a-f]{3,8}$/i.test(color) || /^[a-z]{3,20}$/i.test(color)) {
+              clean.setAttribute("color", color);
+            }
+          }
+          return clean;
+        }
+
+        const fragment = document.createDocumentFragment();
+        Array.from(parsed.body.childNodes, cleanNode).forEach(node => fragment.append(node));
+        return fragment;
+      }
+
+      function rememberSelection() {
+        const selection = window.getSelection();
+        if (selection && selection.rangeCount && writingArea.contains(selection.anchorNode)) {
+          savedSelection = selection.getRangeAt(0).cloneRange();
+        }
+      }
+
+      function restoreSelection() {
+        if (!savedSelection || !writingArea.contains(savedSelection.commonAncestorContainer)) {
+          writingArea.focus();
+          return;
+        }
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(savedSelection);
+        writingArea.focus();
+      }
+
+      function runCommand(command, value = null) {
+        restoreSelection();
+        document.execCommand(command, false, value);
+        rememberSelection();
+        saveBoard();
+        updateToolbarState();
+      }
+
+      function updateToolbarState() {
+        for (const button of formatToolbar.querySelectorAll("[data-command]")) {
+          const command = button.dataset.command;
+          if (["bold", "italic", "underline", "strikeThrough"].includes(command)) {
+            button.setAttribute("aria-pressed", String(document.queryCommandState(command)));
+          }
+        }
+      }
+
+      function loadBoard() {
+        try {
+          const saved = localStorage.getItem(storageKey);
+          if (saved) {
+            const board = JSON.parse(saved);
+            if (typeof board.html === "string") {
+              writingArea.replaceChildren(sanitizeHtml(board.html));
+            } else if (typeof board.text === "string") {
+              writingArea.textContent = board.text;
+            }
+            if (Object.hasOwn(fontStacks, board.font)) {
+              fontFamily.value = board.font;
+            }
+            const size = Number(board.size);
+            if (Number.isFinite(size) && size >= 12 && size <= 120) {
+              fontSize.value = String(size);
+            }
+            saveStatus.textContent = "저장된 칠판 내용을 불러왔습니다.";
+          }
+          applySettings();
+        } catch (error) {
+          saveStatus.textContent = "저장된 내용을 불러오지 못했습니다. 브라우저 저장 공간 설정을 확인해 주세요.";
+          console.error("칠판 내용을 불러오지 못했습니다.", error);
+        }
+      }
+
+      writingArea.addEventListener("input", saveBoard);
+      writingArea.addEventListener("keyup", updateToolbarState);
+      writingArea.addEventListener("mouseup", updateToolbarState);
+      writingArea.addEventListener("touchend", updateToolbarState);
+      document.addEventListener("selectionchange", rememberSelection);
+      writingArea.addEventListener("paste", event => {
+        event.preventDefault();
+        const text = event.clipboardData.getData("text/plain");
+        runCommand("insertText", text);
+      });
+      formatToolbar.addEventListener("click", event => {
+        const button = event.target.closest("[data-command]");
+        if (button) {
+          runCommand(button.dataset.command);
+        }
+      });
+      document.querySelector("#text-color").addEventListener("change", event => {
+        runCommand("foreColor", event.currentTarget.value);
+      });
+      document.querySelector("#insert-link").addEventListener("click", () => {
+        const url = window.prompt("연결할 웹 주소를 입력해 주세요.");
+        if (url) {
+          const href = safeLink(url);
+          if (!href) {
+            window.alert("http, https 또는 mailto 주소만 사용할 수 있어요.");
+            return;
+          }
+          runCommand("createLink", href);
+        }
+      });
+      document.querySelector("#undo").addEventListener("click", () => runCommand("undo"));
+      document.querySelector("#redo").addEventListener("click", () => runCommand("redo"));
+      document.querySelector("#toggle-fullscreen").addEventListener("click", event => {
+        const isFullscreen = boardFrame.classList.toggle("is-fullscreen");
+        event.currentTarget.setAttribute("aria-pressed", String(isFullscreen));
+        event.currentTarget.setAttribute("aria-label", isFullscreen ? "칠판 크게 보기 닫기" : "칠판 크게 보기");
+      });
+      formatToolbar.addEventListener("mousedown", event => {
+        if (event.target.closest("button")) {
+          event.preventDefault();
+        }
+      });
+      fontFamily.addEventListener("change", () => {
+        applySettings();
+        saveBoard();
+      });
+      fontSize.addEventListener("input", () => {
+        const size = Number(fontSize.value);
+        if (Number.isFinite(size) && size >= 12 && size <= 120) {
+          applySettings();
+          saveBoard();
+        }
+      });
+      fontRange.addEventListener("input", () => {
+        fontSize.value = fontRange.value;
+        applySettings();
+        saveBoard();
+      });
+      clearButton.addEventListener("click", () => {
+        if (writingArea.textContent && !window.confirm("칠판의 내용을 모두 지울까요?")) {
+          return;
+        }
+        writingArea.replaceChildren();
+        saveBoard();
+        writingArea.focus();
+      });
+
+      loadBoard();
+    })();
+  </script>
+</body>
+</html>
